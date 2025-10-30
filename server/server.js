@@ -11,6 +11,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Connect to MongoDB
+let isConnected = false;
+
+async function connectDB() {
+    if (isConnected) {
+        return;
+    }
+    try {
+        console.log('Connecting to MongoDB...');
+        await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 10000,
+        });
+        isConnected = true;
+        console.log('✅ MongoDB connected successfully');
+    } catch (err) {
+        console.error('❌ MongoDB connection error:', err.message);
+        throw err;
+    }
+}
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'models/routes/public')));
 
@@ -20,36 +40,6 @@ app.use('/api/posts', postRoutes);
 // Serve index.html for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'models/routes/public', 'index.html'));
-});
-
-// Connect to MongoDB
-let isConnected = false;
-
-async function connectDB() {
-    if (isConnected) {
-        return;
-    }
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 10000,
-        });
-        isConnected = true;
-        console.log('MongoDB connected');
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
-        throw err;
-    }
-}
-
-// Middleware to ensure DB connection before handling requests
-app.use(async (req, res, next) => {
-    try {
-        await connectDB();
-        next();
-    } catch (err) {
-        res.status(500).json({ error: 'Database connection failed' });
-    }
 });
 
 // Start server
