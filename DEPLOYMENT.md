@@ -10,7 +10,6 @@ git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 
 # Or if you use SSH:
 git remote add origin git@github.com:YOUR_USERNAME/YOUR_REPO_NAME.git
-
 # Push your code to GitHub
 git push -u origin master
 

@@ -22,6 +22,33 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'models/routes/public', 'index.html'));
 });
 
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => app.listen(5000, () => console.log("Server running on port 5000\nOpen http://localhost:5000 in your browser")))
-    .catch(err => console.error(err));
+// Connect to MongoDB
+let isConnected = false;
+
+async function connectDB() {
+    if (isConnected) {
+        return;
+    }
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        isConnected = true;
+        console.log('MongoDB connected');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }
+}
+
+// Initialize connection
+connectDB();
+
+// For local development
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Open http://localhost:${PORT} in your browser`);
+    });
+}
+
+// Export for Vercel serverless
+module.exports = app;
