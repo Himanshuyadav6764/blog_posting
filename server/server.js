@@ -52,16 +52,17 @@ app.use(async (req, res, next) => {
     }
 });
 
-// For local development
-if (require.main === module) {
-    const PORT = process.env.PORT || 5000;
-    connectDB().then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Open http://localhost:${PORT} in your browser`);
-        });
+// Start server
+const PORT = process.env.PORT || 5000;
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Open http://localhost:${PORT} in your browser`);
     });
-}
+}).catch(err => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+});
 
-// Export for Vercel serverless
+// Export for Vercel serverless (if needed)
 module.exports = app;
