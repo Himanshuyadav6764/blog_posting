@@ -23,23 +23,19 @@ app.get('/', (req, res) => {
 });
 
 // Connect to MongoDB
-let cachedConnection = null;
+let isConnected = false;
 
 async function connectDB() {
-    if (cachedConnection) {
-        console.log('Using cached MongoDB connection');
-        return cachedConnection;
+    if (isConnected) {
+        return;
     }
-    
     try {
-        console.log('Creating new MongoDB connection...');
-        const connection = await mongoose.connect(process.env.MONGO_URI, {
+        await mongoose.connect(process.env.MONGO_URI, {
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 10000,
         });
-        cachedConnection = connection;
+        isConnected = true;
         console.log('MongoDB connected');
-        return connection;
     } catch (err) {
         console.error('MongoDB connection error:', err);
         throw err;
@@ -56,17 +52,14 @@ app.use(async (req, res, next) => {
     }
 });
 
-// Initialize connection for local development
-if (require.main === module) {
-    connectDB();
-}
-
 // For local development
 if (require.main === module) {
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-        console.log(`Open http://localhost:${PORT} in your browser`);
+    connectDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Open http://localhost:${PORT} in your browser`);
+        });
     });
 }
 
