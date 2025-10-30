@@ -23,23 +23,43 @@ app.get('/', (req, res) => {
 });
 
 // Connect to MongoDB
-let isConnected = false;
+let cachedConnection = null;
 
 async function connectDB() {
-    if (isConnected) {
-        return;
+    if (cachedConnection) {
+        console.log('Using cached MongoDB connection');
+        return cachedConnection;
     }
+    
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        isConnected = true;
+        console.log('Creating new MongoDB connection...');
+        const connection = await mongoose.connect(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 10000,
+        });
+        cachedConnection = connection;
         console.log('MongoDB connected');
+        return connection;
     } catch (err) {
         console.error('MongoDB connection error:', err);
+        throw err;
     }
 }
 
-// Initialize connection
-connectDB();
+// Middleware to ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        res.status(500).json({ error: 'Database connection failed' });
+    }
+});
+
+// Initialize connection for local development
+if (require.main === module) {
+    connectDB();
+}
 
 // For local development
 if (require.main === module) {
