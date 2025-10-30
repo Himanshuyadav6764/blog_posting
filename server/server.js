@@ -54,9 +54,11 @@ app.use(async (req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0'; // Bind to all network interfaces for Render
+
 connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+    app.listen(PORT, HOST, () => {
+        console.log(`Server running on ${HOST}:${PORT}`);
         console.log(`Open http://localhost:${PORT} in your browser`);
     });
 }).catch(err => {
