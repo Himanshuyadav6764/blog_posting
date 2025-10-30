@@ -2,10 +2,11 @@
   "name": "blogging-system",
   "version": "1.0.0",
   "description": "A modern blogging platform with Express.js and MongoDB",
-  "main": "server/server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "local": "node server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["blog", "express", "mongodb", "nodejs"],
