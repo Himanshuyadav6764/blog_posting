@@ -6,6 +6,6 @@ services:
     startCommand: node server/server.js
     envVars:
       - key: MONGO_URI
-        value: mongodb+srv://yadavhimanshu88272_db_user:Majar@123@cluster0.mfempxz.mongodb.net/bloggingDB?retryWrites=true&w=majority
+        value: mongodb+srv://yadavhimanshu88272_db_user:Majar%40123@cluster0.mfempxz.mongodb.net/bloggingDB?retryWrites=true&w=majority
       - key: PORT
         value: 10000
