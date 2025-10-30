@@ -5,7 +5,8 @@ const cors = require('cors');
 const path = require('path');
 const postRoutes = require('./server/models/routes/posts');
 
-dotenv.config();
+// Load environment variables from server/.env for local development
+dotenv.config({ path: './server/.env' });
 
 const app = express();
 app.use(cors());
