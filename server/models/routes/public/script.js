@@ -86,7 +86,7 @@ function setupEventListeners() {
 async function fetchPosts() {
     try {
         showLoading(true);
-        const res = await fetch("http://localhost:5000/api/posts");
+        const res = await fetch("/api/posts");
         allPosts = await res.json();
         showLoading(false);
         displayPosts(allPosts);
@@ -163,7 +163,7 @@ async function handleSubmit(e) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
         
-        const res = await fetch("http://localhost:5000/api/posts", {
+        const res = await fetch("/api/posts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ title, content })
@@ -226,7 +226,7 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
     if (!deletePostId) return;
     
     try {
-        const res = await fetch(`http://localhost:5000/api/posts/${deletePostId}`, {
+        const res = await fetch(`/api/posts/${deletePostId}`, {
             method: "DELETE"
         });
         
