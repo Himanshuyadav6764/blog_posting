@@ -1,4 +1,4 @@
-// DOM Elements
+// getting all elements from html
 const postForm = document.getElementById("postForm");
 const postsDiv = document.getElementById("posts");
 const titleInput = document.getElementById("title");
@@ -13,50 +13,66 @@ const emptyState = document.getElementById("emptyState");
 const createSection = document.getElementById("createSection");
 const postsSection = document.getElementById("postsSection");
 
-// State
+// storing posts and filter data
 let allPosts = [];
 let currentFilter = "all";
 let deletePostId = null;
 
-// Initialize
+// switching between home and create sections
+function showCreateSection() {
+    createSection.style.display = "block";
+    postsSection.style.display = "none";
+    window.scrollTo({ top: 0, behavior: "smooth" });  // scroll to top
+}
+
+function showHomeSection() {
+    createSection.style.display = "none";
+    postsSection.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// when page loads
 document.addEventListener("DOMContentLoaded", () => {
     initializeTheme();
-    fetchPosts();
+    fetchPosts();  // get posts from backend
     setupEventListeners();
 });
 
-// Setup Event Listeners
+// setting up all click events etc
 function setupEventListeners() {
-    // Form submission
+    // when form submitted
     postForm.addEventListener("submit", handleSubmit);
     
-    // Character counters
+    // title character count
     titleInput.addEventListener("input", () => {
         const count = titleInput.value.length;
         titleCount.textContent = `${count}/100`;
-        if (count > 100) titleInput.value = titleInput.value.substring(0, 100);
+        if (count > 100) titleInput.value = titleInput.value.substring(0, 100);  // max 100 chars
+        // if (count >= 90) titleCount.style.color = 'red'; // maybe add warning color
     });
     
+    // content character count
     contentInput.addEventListener("input", () => {
         const count = contentInput.value.length;
         contentCount.textContent = `${count}/5000`;
-        if (count > 5000) contentInput.value = contentInput.value.substring(0, 5000);
+        if (count > 5000) contentInput.value = contentInput.value.substring(0, 5000);  // max 5000
     });
     
-    // Clear button
+    // clear button click
     clearBtn.addEventListener("click", () => {
         postForm.reset();
         titleCount.textContent = "0/100";
         contentCount.textContent = "0/5000";
     });
     
-    // Search
+    // search box typing
     searchInput.addEventListener("input", filterPosts);
     
-    // Theme toggle
+
+    // dark/light theme button
     themeToggle.addEventListener("click", toggleTheme);
     
-    // Filter buttons
+    // filter buttons - all, recent, oldest
     document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
@@ -66,7 +82,7 @@ function setupEventListeners() {
         });
     });
     
-    // Navigation
+    // home and create nav buttons
     document.querySelectorAll(".nav-btn[data-view]").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const view = e.currentTarget.dataset.view;
@@ -82,30 +98,32 @@ function setupEventListeners() {
     });
 }
 
-// Fetch Posts
+// get posts from server
 async function fetchPosts() {
     try {
         showLoading(true);
-        const res = await fetch("/api/posts");
+        const res = await fetch("/api/posts");  // calling backend api
         allPosts = await res.json();
         showLoading(false);
-        displayPosts(allPosts);
+        displayPosts(allPosts);  // show on page
     } catch (error) {
         showLoading(false);
         showToast("Failed to load posts", "error");
-        console.error(error);
+        console.log(error);  // for debugging
+        // TODO: add retry logic later
     }
 }
 
-// Display Posts
+// show posts on page
 function displayPosts(posts) {
     if (posts.length === 0) {
         postsDiv.innerHTML = "";
-        emptyState.style.display = "block";
+        emptyState.style.display = "block";  // show empty message
         return;
     }
     
     emptyState.style.display = "none";
+    // console.log('displaying', posts.length, 'posts');
     postsDiv.innerHTML = posts.map(post => `
         <article class="post-card" data-id="${post._id}">
             <div class="post-header">
@@ -135,24 +153,24 @@ function displayPosts(posts) {
         </article>
     `).join("");
     
-    // Add animation
+    // animation effect for cards
     setTimeout(() => {
         document.querySelectorAll(".post-card").forEach((card, index) => {
             setTimeout(() => {
                 card.style.opacity = "1";
                 card.style.transform = "translateY(0)";
-            }, index * 50);
+            }, index * 50);  // delay each card a bit
         });
     }, 10);
 }
 
-// Handle Form Submit
+// when user submits the form
 async function handleSubmit(e) {
     e.preventDefault();
     
     const title = titleInput.value.trim();
     const content = contentInput.value.trim();
-    
+
     if (!title || !content) {
         showToast("Please fill in all fields", "error");
         return;
@@ -160,7 +178,7 @@ async function handleSubmit(e) {
     
     try {
         const submitBtn = postForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
+        submitBtn.disabled = true;  // prevent double click
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
         
         const res = await fetch("/api/posts", {
@@ -170,12 +188,13 @@ async function handleSubmit(e) {
         });
         
         if (res.ok) {
-            postForm.reset();
+            postForm.reset();  // clear form
             titleCount.textContent = "0/100";
             contentCount.textContent = "0/5000";
             showToast("Post published successfully!", "success");
-            await fetchPosts();
-            showHomeSection();
+            await fetchPosts();  // reload posts
+            showHomeSection();  // go to home
+            // TODO: scroll to the new post
         } else {
             showToast("Failed to publish post", "error");
         }
@@ -184,22 +203,25 @@ async function handleSubmit(e) {
         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish Post';
     } catch (error) {
         showToast("Network error occurred", "error");
-        console.error(error);
+        console.log(error);
     }
 }
 
-// Filter Posts
+// filtering and searching posts
 function filterPosts() {
     let filtered = [...allPosts];
     
-    // Apply filter
+    // sort by filter type
     if (currentFilter === "recent") {
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));  // newest first
     } else if (currentFilter === "oldest") {
-        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));  // oldest first
     }
+    // else if (currentFilter === "popular") { // maybe add this later
+    //     filtered.sort((a, b) => b.views - a.views);
+    // }
     
-    // Apply search
+    // search in title and content
     const searchTerm = searchInput.value.toLowerCase();
     if (searchTerm) {
         filtered = filtered.filter(post => 
@@ -211,7 +233,7 @@ function filterPosts() {
     displayPosts(filtered);
 }
 
-// Delete Post Modal
+// delete modal popup
 function openDeleteModal(id) {
     deletePostId = id;
     document.getElementById("deleteModal").classList.add("active");
@@ -232,7 +254,7 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
         
         if (res.ok) {
             showToast("Post deleted successfully", "success");
-            await fetchPosts();
+            await fetchPosts();  // refresh posts
         } else {
             showToast("Failed to delete post", "error");
         }
@@ -243,23 +265,25 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
     closeDeleteModal();
 });
 
-// Edit Post (placeholder - you can extend this)
+// edit feature - not implemented yet
 function editPost(id) {
     showToast("Edit feature coming soon!", "info");
+    // TODO: make edit modal
 }
 
-// Theme Toggle
+
+// dark/light theme switching
 function initializeTheme() {
-    const theme = localStorage.getItem("theme") || "light";
+    const theme = localStorage.getItem("theme") || "light";  // default light
     document.body.dataset.theme = theme;
     updateThemeIcon(theme);
 }
 
 function toggleTheme() {
     const currentTheme = document.body.dataset.theme;
-    const newTheme = currentTheme === "light" ? "dark" : "light";
+    const newTheme = currentTheme === "light" ? "dark" : "light";  // switch theme
     document.body.dataset.theme = newTheme;
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem("theme", newTheme);  // save for next time
     updateThemeIcon(newTheme);
 }
 
@@ -268,34 +292,23 @@ function updateThemeIcon(theme) {
     icon.className = theme === "light" ? "fas fa-moon" : "fas fa-sun";
 }
 
-// Show/Hide Sections
-function showCreateSection() {
-    createSection.style.display = "block";
-    postsSection.style.display = "none";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function showHomeSection() {
-    createSection.style.display = "none";
-    postsSection.style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-// Utility Functions
+// show/hide loading spinner
 function showLoading(show) {
     loadingSpinner.style.display = show ? "flex" : "none";
 }
 
+// toast notification popup
 function showToast(message, type = "info") {
     const toast = document.getElementById("toast");
     toast.textContent = message;
     toast.className = `toast ${type} show`;
     
     setTimeout(() => {
-        toast.classList.remove("show");
+        toast.classList.remove("show");  // hide after 3 seconds
     }, 3000);
 }
 
+// format date like "2 days ago"
 function formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -306,6 +319,7 @@ function formatDate(dateString) {
     if (days === 1) return "Yesterday";
     if (days < 7) return `${days} days ago`;
     
+    // for older posts show full date
     return date.toLocaleDateString("en-US", { 
         year: "numeric", 
         month: "short", 
@@ -313,18 +327,21 @@ function formatDate(dateString) {
     });
 }
 
+// calculate reading time
 function getReadingTime(content) {
-    const wordsPerMinute = 200;
+    const wordsPerMinute = 200;  // average reading speed
     const words = content.split(/\s+/).length;
-    const minutes = Math.ceil(words / wordsPerMinute);
-    return `${minutes} min read`;
+    const mins = Math.ceil(words / wordsPerMinute);
+    return `${mins} min read`;
 }
 
+// prevent xss attacks
 function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Initialize on page load
+
+// start with home section visible
 showHomeSection();

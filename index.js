@@ -5,46 +5,48 @@ const cors = require('cors');
 const path = require('path');
 const postRoutes = require('./server/models/routes/posts');
 
-// Load environment variables from server/.env for local development
+// loading env file here
 dotenv.config({ path: './server/.env' });
 
 const app = express();
-app.use(cors());
+app.use(cors());   // allowing all origins for now
 app.use(express.json());
 
-// Connect to MongoDB
+// mongodb connection stuff
 let isConnected = false;
 
 async function connectDB() {
-  if (isConnected) return;
+  if (isConnected) return;  // already connected
   try {
-    console.log('Connecting to MongoDB...');
+    console.log('trying to connect mongodb...');
     await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 10000 });
     isConnected = true;
-    console.log('✅ MongoDB connected successfully');
+    console.log('mongodb connected!');
   } catch (err) {
-    console.error('❌ MongoDB connection error:', err.message);
+    console.log('connection failed:', err.message);
+    // console.log(err); // for debugging
     process.exit(1);
   }
 }
 
-// Serve static files
+// public folder for html css js files
 app.use(express.static(path.join(__dirname, 'server/models/routes/public')));
 
-// API routes
+// api endpoints
 app.use('/api/posts', postRoutes);
 
-// Serve index.html
+
+// home page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'server/models/routes/public', 'index.html'));
 });
 
-// Start server
+// server start
 const PORT = process.env.PORT || 5000;
-const HOST = '0.0.0.0';
+const HOST = '0.0.0.0';  // works on render/railway
 
 connectDB().then(() => {
-  app.listen(PORT, HOST, () => console.log(`🚀 Server running on ${HOST}:${PORT}`));
+  app.listen(PORT, HOST, () => console.log('Server started on port ' + PORT));
 });
 
 module.exports = app;

@@ -1,4 +1,4 @@
-/* ===== CSS Variables ===== */
+/* colors and themes */
 :root {
     --primary-color: #6366f1;
     --primary-hover: #4f46e5;
@@ -29,7 +29,8 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark Theme */
+
+/* dark mode colors */
 body[data-theme="dark"] {
     --bg-primary: #1f2937;
     --bg-secondary: #111827;
@@ -40,7 +41,7 @@ body[data-theme="dark"] {
     --border-color: #374151;
 }
 
-/* ===== Reset & Base ===== */
+/* basic reset */
 * {
     margin: 0;
     padding: 0;
@@ -58,7 +59,7 @@ body {
     flex-direction: column;
 }
 
-/* ===== Header ===== */
+/* top header bar */
 .header {
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
@@ -132,7 +133,7 @@ body {
     font-size: 1rem;
 }
 
-/* ===== Container ===== */
+/* page container */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -140,13 +141,13 @@ body {
     width: 100%;
 }
 
-/* ===== Main Content ===== */
+/* main page area */
 .main-content {
     flex: 1;
     padding: 2rem 0;
 }
 
-/* ===== Create Section ===== */
+/* create new post section */
 .create-section {
     margin-bottom: 3rem;
 }
@@ -233,7 +234,7 @@ body {
     margin-top: 2rem;
 }
 
-/* ===== Buttons ===== */
+/* button styles */
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -305,7 +306,7 @@ body {
     color: var(--danger-color);
 }
 
-/* ===== Posts Section ===== */
+/* posts section styling */
 .posts-section {
     max-width: 1000px;
     margin: 0 auto;
@@ -390,7 +391,7 @@ body {
     color: white;
 }
 
-/* ===== Posts Grid ===== */
+/* post cards grid */
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -464,7 +465,7 @@ body {
     gap: 0.375rem;
 }
 
-/* ===== Loading Spinner ===== */
+/* loading animation */
 .loading-spinner {
     display: flex;
     flex-direction: column;
@@ -484,7 +485,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* ===== Empty State ===== */
+/* no posts message */
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
@@ -510,7 +511,7 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* ===== Toast Notification ===== */
+/* notification popup */
 .toast {
     position: fixed;
     bottom: 2rem;
@@ -547,7 +548,7 @@ body {
     border-left-color: var(--info-color);
 }
 
-/* ===== Modal ===== */
+/* delete confirmation popup */
 .modal {
     display: none;
     position: fixed;
@@ -612,7 +613,7 @@ body {
     justify-content: flex-end;
 }
 
-/* ===== Footer ===== */
+/* bottom footer */
 .footer {
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
@@ -640,7 +641,7 @@ body {
     }
 }
 
-/* ===== Responsive Design ===== */
+/* mobile responsive */
 @media (max-width: 768px) {
     .header .container {
         flex-direction: column;
@@ -695,7 +696,7 @@ body {
     }
 }
 
-/* ===== Scrollbar Styling ===== */
+/* custom scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
 }
